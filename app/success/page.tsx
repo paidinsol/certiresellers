@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useCart } from '../context/CartContext';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -12,7 +12,8 @@ interface OrderSummary {
   itemCount: number;
 }
 
-export default function SuccessPage() {
+// Separate component that uses useSearchParams
+function SuccessContent() {
   const { dispatch, state } = useCart();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
@@ -228,3 +229,13 @@ const cleanupOldSessions = () => {
     localStorage.setItem('processedSessions', JSON.stringify(recentSessions));
   }
 };
+
+
+// Main component with Suspense boundary
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center min-h-screen">Loading...</div>}>
+      <SuccessContent />
+    </Suspense>
+  );
+}
